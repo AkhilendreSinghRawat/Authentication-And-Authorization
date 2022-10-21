@@ -37,16 +37,17 @@ app.post('/register', (req, res) => {
 
 app.post('/login', (req, res) => {
   const user = USERS.find((user) => user.email === req.body.email)
-  if (user === null) {
+  if (!user) {
     return res.status(400).json({ message: 'Email not registered' })
   }
+  console.log('sdaffsd')
   bcrypt
     .compare(req.body.password, user.password)
     .then((isMatch) => {
       if (isMatch) {
-        res.json({ message: 'Successfully logged in' })
+        res.status(200).json({ message: 'Successfully logged in' })
       } else {
-        res.json({ message: 'Incorrect password' })
+        res.status(409).json({ message: 'Incorrect password' })
       }
     })
     .catch((err) => res.status(500).send(err))
