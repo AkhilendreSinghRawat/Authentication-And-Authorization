@@ -1,17 +1,11 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Home from './Home'
-import Register from './Register'
-import Signin from './Signin'
+import { BrowserRouter as Router } from 'react-router-dom'
+import Routing from './routers'
 
 const App = () => {
   return (
     <div className="App">
       <Router>
-        <Routes>
-          <Route path="/" exact element={<Home />} />
-          <Route path="/signup" exact element={<Register />} />
-          <Route path="/signin" exact element={<Signin />} />
-        </Routes>
+        <Routing />
       </Router>
     </div>
   )
