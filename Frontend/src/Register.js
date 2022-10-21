@@ -30,7 +30,7 @@ const Register = () => {
       .then((res) => {
         console.log(res)
         if (res.status === 200) {
-          navigate('/')
+          navigate('/signin')
           return
         }
         console.log('Something went wrong')
