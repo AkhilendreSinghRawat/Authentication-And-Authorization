@@ -3,6 +3,7 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 app.use(express.json())
 app.use(
@@ -14,11 +15,27 @@ app.use(
 const port = process.env.PORT || 9000
 
 const USERS = []
+const DATA = { secret: 'I am Spiderman' }
+
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization']
+  const token = authHeader && authHeader.split(' ')[1]
+  if (token == null) return res.sendStatus(401) //no token
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403) //token is nolonger invalid
+    req.user = user
+    next()
+  })
+}
+
+app.get('/data', authenticateToken, (req, res) => {
+  res.json(DATA)
+})
 
 app.post('/register', (req, res) => {
   if (
     USERS.find((user) => {
-      console.log(user.email)
       return user.email === req.body.email
     })
   ) {
@@ -44,7 +61,9 @@ app.post('/login', (req, res) => {
     .compare(req.body.password, user.password)
     .then((isMatch) => {
       if (isMatch) {
-        res.status(200).json({ message: 'Successfully logged in' })
+        const email = { email: req.body.email }
+        const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET)
+        res.status(200).json({ accessToken: accessToken })
       } else {
         res.status(409).json({ message: 'Incorrect password' })
       }

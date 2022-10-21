@@ -27,15 +27,14 @@ const Signin = () => {
         password: passwordRef?.current?.value,
       })
       .then((res) => {
-        console.log(res)
         if (res.status === 200) {
+          sessionStorage.setItem('accessToken', res?.data?.accessToken)
           navigate('/')
           return
         }
         console.log('Something went wrong')
       })
       .catch((err) => {
-        console.log(err)
         setErrorMessage(err?.response?.data.message)
         setShowError(true)
         setTimeout(() => setShowError(false), 2000)

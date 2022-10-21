@@ -28,7 +28,6 @@ const Register = () => {
         password: passwordRef?.current?.value,
       })
       .then((res) => {
-        console.log(res)
         if (res.status === 200) {
           navigate('/signin')
           return
@@ -36,7 +35,6 @@ const Register = () => {
         console.log('Something went wrong')
       })
       .catch((err) => {
-        console.log(err)
         setErrorMessage(err?.response?.data.message)
         setShowError(true)
         setTimeout(() => setShowError(false), 2000)
