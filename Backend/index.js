@@ -40,7 +40,6 @@ app.post('/login', (req, res) => {
   if (!user) {
     return res.status(400).json({ message: 'Email not registered' })
   }
-  console.log('sdaffsd')
   bcrypt
     .compare(req.body.password, user.password)
     .then((isMatch) => {
