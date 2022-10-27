@@ -15,15 +15,20 @@ app.use(
 const port = process.env.PORT || 9000
 
 const USERS = []
-const DATA = { secret: 'I am Spiderman' }
+const refreshTokens = []
+const DATA = { secret: 'Genda Swami' }
+
+const generateAccessToken = (user) => {
+  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30s' })
+}
 
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization']
   const token = authHeader && authHeader.split(' ')[1]
-  if (token == null) return res.sendStatus(401) //no token
+  if (token == null) return res.status(401).json({ message: 'Token Not Found' }) //no token
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403) //token is nolonger invalid
+    if (err) return res.status(403).json({ message: 'Token Is Nolonger Valid' }) //token is nolonger invalid
     req.user = user
     next()
   })
@@ -31,6 +36,22 @@ const authenticateToken = (req, res, next) => {
 
 app.get('/data', authenticateToken, (req, res) => {
   res.json(DATA)
+})
+
+app.delete('/logout', (req, res) => {
+  refreshTokens = refreshTokens.filter((token) => token !== req.body.token)
+  res.status(204).json({ message: 'Successfully logged out' })
+})
+
+app.post('/token', (req, res) => {
+  const refreshToken = req.body.refreshToken
+  if (refreshToken == null) return res.sendStatus(401)
+  if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403)
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403)
+    const accessToken = generateAccessToken({ email: user.email })
+    res.json({ accessToken: accessToken })
+  })
 })
 
 app.post('/register', (req, res) => {
@@ -62,8 +83,12 @@ app.post('/login', (req, res) => {
     .then((isMatch) => {
       if (isMatch) {
         const email = { email: req.body.email }
-        const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET)
-        res.status(200).json({ accessToken: accessToken })
+        const accessToken = generateAccessToken(email)
+        const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET)
+        refreshTokens.push(refreshToken)
+        res
+          .status(200)
+          .json({ accessToken: accessToken, refreshToken: refreshToken })
       } else {
         res.status(409).json({ message: 'Incorrect password' })
       }

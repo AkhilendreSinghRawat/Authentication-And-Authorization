@@ -14,13 +14,6 @@ const Signin = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    // if (passwordRef?.current?.value !== confirmPasswordRef?.current?.value) {
-    //   setErrorMessage("Password Didn't Match!")
-    //   setShowError(true)
-    //   setTimeout(() => setShowError(false), 2000)
-    //   return
-    // }
-
     axios
       .post('/login', {
         email: emailRef?.current?.value,
@@ -29,6 +22,7 @@ const Signin = () => {
       .then((res) => {
         if (res.status === 200) {
           sessionStorage.setItem('accessToken', res?.data?.accessToken)
+          sessionStorage.setItem('refreshToken', res?.data?.refreshToken)
           navigate('/')
           return
         }

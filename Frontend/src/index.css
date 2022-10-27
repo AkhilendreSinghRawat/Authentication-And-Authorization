@@ -21,6 +21,7 @@ code {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
   height: 100vh;
 }
 
@@ -46,6 +47,22 @@ code {
 
 .Submit:hover {
   background-color: #45a049;
+}
+
+.Secret {
+  width: 100%;
+  background-color: blue;
+  color: white;
+  padding: 1vh 2vw;
+  margin: 1vh 0;
+  border: none;
+  border-radius: 0.5vw;
+  cursor: pointer;
+  font-size: large;
+}
+
+.Secret:hover {
+  background-color: darkblue;
 }
 
 .Input {
