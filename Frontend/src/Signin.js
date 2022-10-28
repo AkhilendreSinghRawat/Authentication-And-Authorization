@@ -21,8 +21,13 @@ const Signin = () => {
       })
       .then((res) => {
         if (res.status === 200) {
-          sessionStorage.setItem('accessToken', res?.data?.accessToken)
-          sessionStorage.setItem('refreshToken', res?.data?.refreshToken)
+          sessionStorage.setItem(
+            'token',
+            JSON.stringify({
+              accessToken: res?.data?.accessToken,
+              refreshToken: res?.data?.refreshToken,
+            })
+          )
           navigate('/')
           return
         }

@@ -12,13 +12,15 @@ const Home = () => {
     navigate('/signin')
   }
 
-  const generateAccessToken = () => {
-    const refreshToken = sessionStorage.getItem('refreshToken')
-    if (refreshToken) {
+  const generateAccessToken = (token) => {
+    if (token?.refreshToken) {
       axios
-        .post('/token', { refreshToken })
+        .post('/token', { refreshToken: token?.refreshToken })
         .then((res) => {
-          sessionStorage.setItem('accessToken', res?.data?.accessToken)
+          sessionStorage.setItem(
+            'token',
+            JSON.stringify({ ...token, accessToken: res?.data?.accessToken })
+          )
           handleSecret()
         })
         .catch((err) => console.log(err))
@@ -33,19 +35,21 @@ const Home = () => {
       setSecret(null)
       return
     }
-    const accessToken = sessionStorage.getItem('accessToken')
-    if (accessToken) {
+    const token = JSON.parse(sessionStorage.getItem('token'))
+    if (token?.accessToken) {
       axios
-        .get('/data', { headers: { authorization: `Bearer ${accessToken}` } })
+        .get('/data', {
+          headers: { authorization: `Bearer ${token?.accessToken}` },
+        })
         .then((res) => {
           setSecret(res?.data?.secret)
           setShowSecret(true)
         })
         .catch((err) => {
-          generateAccessToken()
+          generateAccessToken(token)
         })
     } else {
-      generateAccessToken()
+      generateAccessToken(token)
     }
   }
 
